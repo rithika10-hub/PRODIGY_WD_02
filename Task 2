@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .stopwatch {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .time-display {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .controls button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            margin: 0.5rem;
+            cursor: pointer;
+            border: none;
+            background: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .controls button:hover {
+            background: #0056b3;
+        }
+
+        .laps {
+            list-style: none;
+            padding: 0;
+            margin-top: 1rem;
+        }
+
+        .laps li {
+            padding: 0.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="stopwatch">
+        <div class="time-display" id="time-display">00:00:00</div>
+        <div class="controls">
+            <button id="start-stop">Start</button>
+            <button id="reset">Reset</button>
+            <button id="lap">Lap</button>
+        </div>
+        <ul class="laps" id="laps"></ul>
+    </div>
+
+    <script>
+        let startTime;
+        let elapsedTime = 0;
+        let timerInterval;
+        let running = false;
+
+        const timeDisplay = document.getElementById('time-display');
+        const startStopButton = document.getElementById('start-stop');
+        const resetButton = document.getElementById('reset');
+        const lapButton = document.getElementById('lap');
+        const lapsContainer = document.getElementById('laps');
+
+        function formatTime(ms) {
+            let totalSeconds = Math.floor(ms / 1000);
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+            let milliseconds = ms % 1000;
+
+            return (
+                String(minutes).padStart(2, '0') + ':' +
+                String(seconds).padStart(2, '0') + ':' +
+                String(milliseconds).padStart(3, '0')
+            );
+        }
+
+        function start() {
+            startTime = Date.now() - elapsedTime;
+            timerInterval = setInterval(() => {
+                elapsedTime = Date.now() - startTime;
+                timeDisplay.textContent = formatTime(elapsedTime);
+            }, 10);
+            running = true;
+            startStopButton.textContent = 'Pause';
+        }
+
+        function stop() {
+            clearInterval(timerInterval);
+            running = false;
+            startStopButton.textContent = 'Start';
+        }
+
+        function reset() {
+            clearInterval(timerInterval);
+            running = false;
+            elapsedTime = 0;
+            timeDisplay.textContent = '00:00:00';
+            startStopButton.textContent = 'Start';
+            lapsContainer.innerHTML = '';
+        }
+
+        function recordLap() {
+            if (running) {
+                const lapTime = document.createElement('li');
+                lapTime.textContent = formatTime(elapsedTime);
+                lapsContainer.appendChild(lapTime);
+            }
+        }
+
+        startStopButton.addEventListener('click', () => {
+            if (running) {
+                stop();
+            } else {
+                start();
+            }
+        });
+
+        resetButton.addEventListener('click', reset);
+        lapButton.addEventListener('click', recordLap);
+    </script>
+</body>
+</html>
